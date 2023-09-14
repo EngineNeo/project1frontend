@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 function App() {
   const [healthStatus, setHealthStatus] = useState(null);
 
+  // REST GET call to database endpoint
   const checkHealth = () => {
     fetch('http://localhost:8000/health-check')
       .then(response => response.json())
