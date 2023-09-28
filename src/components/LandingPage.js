@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Container, 
   Grid, 
@@ -19,39 +19,25 @@ const useStyles = makeStyles({
   },
 });
 
-const mockMoviesData = [
-  { 
-    film_id: 1, 
-    title: 'Movie 1', 
-    description: 'Description 1', 
-    release_year: 2001, 
-    // ... other movie properties ...
-  },
-  { 
-    film_id: 2, 
-    title: 'Movie 2', 
-    description: 'Description 2', 
-    release_year: 2002, 
-    // ... other movie properties ...
-  },
-  // ... other movies ...
-];
-
-const mockActorsData = [
-  { actor_id: 1, first_name: 'Actor', last_name: 'One', films_count: 10 },
-  { actor_id: 2, first_name: 'Actor', last_name: 'Two', films_count: 12 },
-  // ... other actors ...
-];
-
 function LandingPage() {
     const classes = useStyles();
-    const [selectedMovie, setSelectedMovie] = useState(null);
-    const [selectedActor, setSelectedActor] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [moviesData, setMoviesData] = useState([]);
+    const [actorsData, setActorsData] = useState([]);
 
     const handleRowClick = (item) => {
     setSelectedItem(item);
     };
+
+    useEffect(() => {
+      fetch('/top-movies/')
+          .then(response => response.json())
+          .then(data => setMoviesData(data));
+
+      fetch('/top-actors/')
+          .then(response => response.json())
+          .then(data => setActorsData(data));
+  }, []);
 
     return (
         <Container>
@@ -68,7 +54,7 @@ function LandingPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {mockMoviesData.map(movie => (
+                  {moviesData.map(movie => (
                     <TableRow
                       key={movie.film_id}
                       onClick={() => handleRowClick(movie)}
@@ -92,7 +78,7 @@ function LandingPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {mockActorsData.map(actor => (
+                  {actorsData.map(actor => (
                     <TableRow
                       key={actor.actor_id}
                       onClick={() => handleRowClick(actor)}
