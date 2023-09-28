@@ -20,12 +20,13 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route exact path="/" component={LandingPage} />
-        <Route path="/movies" component={Movies} />
-        <Route path="/customers" component={Customers} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/customers" element={<Customers />} />
       </Routes>
     </Router>
   );
 }
+
 
 export default App;
