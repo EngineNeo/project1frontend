@@ -4,40 +4,44 @@ import {
   Typography,
   TextField,
   Button,
-  Card,
-  CardContent,
-  CardActions,
-  List,
-  ListItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@material-ui/core';
 
 function Customers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
-    // Fetch data for customers
-    // Replace with actual data fetching logic
+    // Fetch the list of customers when the component mounts
+    fetchCustomers();
   }, []);
 
+  const fetchCustomers = () => {
+    // Fetch the list of customers from your backend API
+    // Replace with actual API endpoint and fetch logic
+    fetch('http://127.0.0.1:8000/customers/')
+      .then((response) => response.json())
+      .then((data) => setCustomers(data));
+  };
+
   const handleSearch = () => {
-    // Logic to search customers based on searchTerm
+    // Fetch filtered customers based on searchTerm when the Search button is clicked
     // Replace with actual search logic
+    searchCustomers(searchTerm);
   };
 
-  const handleAddCustomer = () => {
-    // Logic to add a new customer
-    // Replace with actual add logic
-  };
-
-  const handleEditCustomer = (customerId) => {
-    // Logic to edit a customer
-    // Replace with actual edit logic
-  };
-
-  const handleDeleteCustomer = (customerId) => {
-    // Logic to delete a customer
-    // Replace with actual delete logic
+  const searchCustomers = (searchTerm) => {
+    // Fetch filtered customers based on searchTerm from your backend API
+    // Replace with actual API endpoint and fetch logic
+    fetch(`/api/customers/?search=${searchTerm}`)
+      .then((response) => response.json())
+      .then((data) => setCustomers(data));
   };
 
   return (
@@ -54,30 +58,37 @@ function Customers() {
       <Button variant="contained" color="primary" onClick={handleSearch}>
         Search
       </Button>
-      <Button variant="contained" color="secondary" onClick={handleAddCustomer}>
-        Add Customer
-      </Button>
 
-      <List>
-        {customers.map((customer, index) => (
-          <ListItem key={index}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">{customer.firstName} {customer.lastName}</Typography>
-                {/* Add more customer details as needed */}
-              </CardContent>
-              <CardActions>
-                <Button color="primary" onClick={() => handleEditCustomer(customer.id)}>
-                  Edit
-                </Button>
-                <Button color="secondary" onClick={() => handleDeleteCustomer(customer.id)}>
-                  Delete
-                </Button>
-              </CardActions>
-            </Card>
-          </ListItem>
-        ))}
-      </List>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Address ID</TableCell>
+              <TableCell>Active</TableCell>
+              <TableCell>Create Date</TableCell>
+              <TableCell>Last Update</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {customers.map((customer) => (
+              <TableRow key={customer.id}>
+                <TableCell>{customer.customer_id}</TableCell>
+                <TableCell>{customer.first_name}</TableCell>
+                <TableCell>{customer.last_name}</TableCell>
+                <TableCell>{customer.email}</TableCell>
+                <TableCell>{customer.address_id}</TableCell>
+                <TableCell>{customer.active}</TableCell>
+                <TableCell>{customer.create_date}</TableCell>
+                <TableCell>{customer.last_update}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Container>
   );
 }

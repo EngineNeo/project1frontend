@@ -30,14 +30,15 @@ function LandingPage() {
     };
 
     useEffect(() => {
-      fetch('/top-movies/')
+      fetch('http://127.0.0.1:8000/top-movies/')
           .then(response => response.json())
           .then(data => setMoviesData(data));
-
-      fetch('/top-actors/')
+  
+      fetch('http://127.0.0.1:8000/top-actors/')
           .then(response => response.json())
           .then(data => setActorsData(data));
   }, []);
+  
 
     return (
         <Container>
@@ -74,7 +75,6 @@ function LandingPage() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
-                    <TableCell>Films Count</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -85,7 +85,6 @@ function LandingPage() {
                       className={classes.hoverCursor}
                     >
                       <TableCell>{actor.first_name} {actor.last_name}</TableCell>
-                      <TableCell>{actor.films_count}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
