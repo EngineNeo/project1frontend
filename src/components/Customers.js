@@ -2,9 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container, Typography, TextField, Button, Table,
   TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Modal, Select, MenuItem, InputLabel
+  Modal, Paper, CircularProgress,
+  List, ListItem, ListItemText
 } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
+import CustomerModal from './CustomerModal';
+import CustomerInfo from './CustomerInfo';
 
 function Customers() {
   const [customerId, setCustomerId] = useState('');
@@ -14,15 +17,14 @@ function Customers() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [setIsModalOpen] = useState(false);
-  const [newCustomerModalOpen, setNewCustomerModalOpen] = useState(false);
-  const [setSelectedCustomer] = useState(null);
-  const [setRentedMovies] = useState([]);
-
-  const [newCustomerFirstName, setNewCustomerFirstName] = useState('');
-  const [newCustomerLastName, setNewCustomerLastName] = useState('');
-  const [newCustomerEmail, setNewCustomerEmail] = useState('');
-  const [newCustomerStore, setNewCustomerStore] = useState('');
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [rentedMovies, setRentedMovies] = useState([]);
 
   const fetchCustomers = useCallback(async (page) => {
     let query = `http://127.0.0.1:8000/customers/?page=${page}`;
@@ -38,18 +40,6 @@ function Customers() {
         setTotalPages(pages);
       });
   }, [customerId, firstName, lastName]);
-
-  const fetchHighestAddressId = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/customers/');
-      const data = await response.json();
-      const highestAddress = data.results.reduce((max, customer) => customer.address > max ? customer.address : max, data.results[0].address);
-      return highestAddress;
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-      return null;
-    }
-  };
 
   const handleSearch = () => {
     fetchCustomers(1);
@@ -67,45 +57,73 @@ function Customers() {
     fetchRentedMovies(customer.customer_id);
   };
 
-  const openNewCustomerModal = () => {
-    setNewCustomerModalOpen(true);
+  const openCustomerModal = () => {
+    setCustomerModalOpen(true);
   };
 
 
-const handleCreateCustomer = async () => {
-  const highestAddressId = await fetchHighestAddressId();
+  const handleCreateCustomer = (newCustomerData) => {
+    console.log("Creating customer", newCustomerData);
 
-    const newCustomer = {
-        first_name: newCustomerFirstName,
-        last_name: newCustomerLastName,
-        email: newCustomerEmail,
-        active: 0,
+    // The URL will depend on your API, here's a placeholder
+    const url = 'http://127.0.0.1:8000/customers/';
+
+    // Options and data for the request
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...newCustomerData,
+        active: 1, // or true, depending on the data type on your server
         create_date: new Date().toISOString(),
         last_update: new Date().toISOString(),
-        address: highestAddressId+1,
-        store: newCustomerStore, 
+      }),
     };
 
-    console.log("Creating customer", newCustomer);
-
-    fetch('http://127.0.0.1:8000/customers/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newCustomer),
-    })
-    .then(response => response.json())
-    .then(data => {
+    // Make the request
+    fetch(url, requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
         console.log('Success:', data);
-        setNewCustomerModalOpen(false);
-        fetchCustomers(1); // refresh the list of customers
-    })
-    .catch((error) => {
+        setCustomerModalOpen(false); // Close the modal
+        fetchCustomers(1); // Refresh the list of customers
+      })
+      .catch(error => {
         console.error('Error:', error);
-    });
-};
+        // Here you would typically set some state to indicate the error to the user
+      });
+  };
 
+  const deleteCustomer = (customerId) => {
+    // The URL will depend on your API. Here's a placeholder.
+    const url = `http://127.0.0.1:8000/customers/${customerId}/`;
+
+    // Options for the DELETE request
+    const requestOptions = {
+      method: 'DELETE',
+    };
+
+    // Make the request
+    fetch(url, requestOptions)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        // Maybe update state or refetch customers to reflect the deletion
+        fetchCustomers(1);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+      });
+  };
 
   const fetchRentedMovies = (customerId) => {
 
@@ -146,7 +164,7 @@ const handleCreateCustomer = async () => {
       <Button variant="contained" color="primary" onClick={handleSearch}>
         Search
       </Button>
-      <Button variant="contained" color="secondary" onClick={openNewCustomerModal} style={{ marginLeft: '20px' }}>
+      <Button variant="contained" color="secondary" onClick={openCustomerModal} style={{ marginLeft: '20px' }}>
         Add Customer
       </Button>
 
@@ -187,44 +205,22 @@ const handleCreateCustomer = async () => {
         onChange={handlePageChange}
       />
 
-      {/* Customer Details Modal */}
-      <Modal open={newCustomerModalOpen} onClose={() => setNewCustomerModalOpen(false)}>
-        <div style={{ backgroundColor: '#fff', padding: '1rem', margin: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h2>Create New Customer</h2>
-          <TextField
-            label="First Name"
-            variant="outlined"
-            value={newCustomerFirstName}
-            onChange={(e) => setNewCustomerFirstName(e.target.value)}
-          />
-          <TextField
-            label="Last Name"
-            variant="outlined"
-            value={newCustomerLastName}
-            onChange={(e) => setNewCustomerLastName(e.target.value)}
-          />
-          <TextField
-            label="Email"
-            variant="outlined"
-            value={newCustomerEmail}
-            onChange={(e) => setNewCustomerEmail(e.target.value)}
-          />
-          <div>
-            <InputLabel id="store-select-label">Store</InputLabel>
-            <Select
-              labelId="store-select-label"
-              value={newCustomerStore}
-              onChange={(e) => setNewCustomerStore(e.target.value)}
-            >
-              <MenuItem value={1}>Store 1</MenuItem>
-              <MenuItem value={2}>Store 2</MenuItem>
-            </Select>
-          </div>
-          <Button variant="contained" color="primary" onClick={handleCreateCustomer}>
-            Create Customer
-          </Button>
-        </div>
-      </Modal>
+      {/* Customer Info Modal */}
+      <CustomerInfo
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        customer={selectedCustomer}
+        rentedMovies={rentedMovies}
+        isLoading={isLoading}
+        onDelete={deleteCustomer} // pass the delete function here
+      />
+
+      {/* Customer Create Modal */}
+      <CustomerModal
+        isOpen={customerModalOpen}
+        onClose={() => setCustomerModalOpen(false)}
+        onCreate={handleCreateCustomer} // Here we're passing the handleCreateCustomer function as the onCreate prop
+      />
 </Container>
 );
 }
