@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './shared/Navbar';
 import LandingPage from './components/LandingPage';
-import Movies from './components/Movies';
 import Customers from './components/Customers';
+import Films from './components/Films';
 
 function App() {
   // const [healthStatus, setHealthStatus] = useState(null);
@@ -21,7 +21,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/movies" element={<Movies />} />
+        <Route path="/films" element={<Films />} />
         <Route path="/customers" element={<Customers />} />
       </Routes>
     </Router>

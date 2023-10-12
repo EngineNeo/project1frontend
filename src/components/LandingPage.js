@@ -36,7 +36,9 @@ function LandingPage() {
   
       fetch('http://127.0.0.1:8000/top-actors/')
           .then(response => response.json())
-          .then(data => setActorsData(data));
+          .then(data => {
+            setActorsData(data);
+          });
   }, []);
   
 
@@ -98,7 +100,53 @@ function LandingPage() {
                     <Typography variant="h6">
                       {selectedItem.title || `${selectedItem.first_name} ${selectedItem.last_name}`}
                     </Typography>
-                    {/* Display more details based on whether a movie or actor is selected */}
+
+                    {selectedItem.title && ( // If it's a movie
+                      <div>
+                        <Typography variant="body1">
+                          Description: {selectedItem.description}
+                        </Typography>
+                        <Typography variant="body1">
+                          Release Year: {selectedItem.release_year}
+                        </Typography>
+                        <Typography variant="body1">
+                          Length: {selectedItem.length} minutes
+                        </Typography>
+                        <Typography variant="body1">
+                          Rating: {selectedItem.rating}
+                        </Typography>
+                      </div>
+                    )}
+
+                  {selectedItem.first_name && ( // If it's an actor
+                    <div>
+                      <Typography variant="body1">
+                        First Name: {selectedItem.first_name}
+                      </Typography>
+                      <Typography variant="body1">
+                        Last Name: {selectedItem.last_name}
+                      </Typography>
+                      <Typography variant="h6" style={{ marginTop: '10px' }}>
+                        Top 5 Rented Movies:
+                      </Typography>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Title</TableCell>
+                            <TableCell>Release Year</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedItem.top_movies && selectedItem.top_movies.map(movie => (
+                            <TableRow key={movie.film_id}>
+                              <TableCell>{movie.title}</TableCell>
+                              <TableCell>{movie.release_year}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
                   </CardContent>
                 </Card>
               )}

@@ -7,7 +7,7 @@ function Navbar() {
     <AppBar position="static">
       <Toolbar>
         <Button component={Link} to="/">Landing Page</Button>
-        <Button component={Link} to="/movies">Movies</Button>
+        <Button component={Link} to="/films">Films</Button>
         <Button component={Link} to="/customers">Customers</Button>
       </Toolbar>
     </AppBar>
