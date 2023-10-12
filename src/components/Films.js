@@ -15,21 +15,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  makeStyles,
 } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 
-const useStyles = makeStyles({
-  title: {
-    '&:hover': {
-      textDecoration: 'underline',
-      cursor: 'pointer',
-    },
-  },
-});
-
 function Films() {
-  const classes = useStyles();
 
   const [filmName, setFilmName] = useState('');
   const [actorName, setActorName] = useState('');
@@ -66,7 +55,7 @@ function Films() {
 
   const handleFilmClick = (film) => {
     setSelectedFilm(film);
-  };
+  };  
 
   useEffect(() => {
     fetchFilms('', '', '', 1);
@@ -98,71 +87,83 @@ function Films() {
       <Button variant="contained" color="primary" onClick={handleSearch}>
         Search
       </Button>
-
-      <div>
-        <List>
-          {films.map((film) => (
-            <ListItem
-              key={film.film_id}
-            >
-              <Card>
-                <CardContent>
-                <Typography
-                  variant="h6"
-                  className={classes.title}
-                  onClick={() => handleFilmClick(film)}
-                >
-                    {film.title}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button variant="contained" color="primary">
-                    Rent
-                  </Button>
-                </CardActions>
-              </Card>
-            </ListItem>
-          ))}
-        </List>
-      </div>
-
-      {selectedFilm && (
-        <div>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">{selectedFilm.title}</Typography>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Description</TableCell>
-                      <TableCell>Release Year</TableCell>
-                      <TableCell>Length</TableCell>
-                      <TableCell>Rating</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>{selectedFilm.description}</TableCell>
-                      <TableCell>{selectedFilm.release_year}</TableCell>
-                      <TableCell>{selectedFilm.length} minutes</TableCell>
-                      <TableCell>{selectedFilm.rating}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
+  
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <div style={{ flex: 3, marginRight: '20px' }}>
+          <List>
+            {films.map((film) => (
+              <ListItem
+                key={film.film_id}
+                button
+                onClick={() => handleFilmClick(film)}
+              >
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6">
+                      {film.title}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button variant="contained" color="primary">
+                      Rent
+                    </Button>
+                  </CardActions>
+                </Card>
+              </ListItem>
+            ))}
+          </List>
         </div>
-      )}
-
+  
+        <div style={{ flex: 2 }}>
+          {selectedFilm && (
+            <Card>
+              <CardContent>
+                <Typography variant="h6">{selectedFilm.title}</Typography>
+                <Typography variant="body1" style={{ marginTop: '10px' }}>
+                Description: {selectedFilm.description}
+              </Typography>
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Release Year</TableCell>
+                        <TableCell>Length</TableCell>
+                        <TableCell>Rating</TableCell>
+                        <TableCell>Rental Duration</TableCell>
+                        <TableCell>Rental Rate</TableCell>
+                        <TableCell>Replacement Cost</TableCell>
+                        <TableCell>Special Features</TableCell>
+                        <TableCell>Last Update</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>{selectedFilm.release_year}</TableCell>
+                        <TableCell>{selectedFilm.length} minutes</TableCell>
+                        <TableCell>{selectedFilm.rating}</TableCell>
+                        <TableCell>{selectedFilm.rental_duration} days</TableCell>
+                        <TableCell>${selectedFilm.rental_rate}</TableCell>
+                        <TableCell>${selectedFilm.replacement_cost}</TableCell>
+                        <TableCell>{selectedFilm.special_features}</TableCell>
+                        <TableCell>{new Date(selectedFilm.last_update).toLocaleString()}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+  
       <Pagination
         count={totalPages}
         page={page}
         onChange={handlePageChange}
+        style={{ marginTop: '20px', justifyContent: 'center' }}
       />
     </Container>
-  );
+  );  
 }
 
 export default Films;

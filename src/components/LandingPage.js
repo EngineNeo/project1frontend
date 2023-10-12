@@ -120,12 +120,6 @@ function LandingPage() {
 
                   {selectedItem.first_name && ( // If it's an actor
                     <div>
-                      <Typography variant="body1">
-                        First Name: {selectedItem.first_name}
-                      </Typography>
-                      <Typography variant="body1">
-                        Last Name: {selectedItem.last_name}
-                      </Typography>
                       <Typography variant="h6" style={{ marginTop: '10px' }}>
                         Top 5 Rented Movies:
                       </Typography>

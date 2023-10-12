@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container, Typography, TextField, Button, Table,
   TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Modal, Paper, List, ListItem, ListItemText, CircularProgress
+  Modal, Select, MenuItem, InputLabel
 } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 
@@ -14,12 +14,17 @@ function Customers() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [rentedMovies, setRentedMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [setIsModalOpen] = useState(false);
+  const [newCustomerModalOpen, setNewCustomerModalOpen] = useState(false);
+  const [setSelectedCustomer] = useState(null);
+  const [setRentedMovies] = useState([]);
 
-  const fetchCustomers = (page) => {
+  const [newCustomerFirstName, setNewCustomerFirstName] = useState('');
+  const [newCustomerLastName, setNewCustomerLastName] = useState('');
+  const [newCustomerEmail, setNewCustomerEmail] = useState('');
+  const [newCustomerStore, setNewCustomerStore] = useState('');
+
+  const fetchCustomers = useCallback(async (page) => {
     let query = `http://127.0.0.1:8000/customers/?page=${page}`;
     if (customerId) query += `&customer_id=${customerId}`;
     if (firstName) query += `&first_name=${firstName}`;
@@ -32,6 +37,18 @@ function Customers() {
         const pages = Math.ceil(data.count / 10);
         setTotalPages(pages);
       });
+  }, [customerId, firstName, lastName]);
+
+  const fetchHighestAddressId = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/customers/');
+      const data = await response.json();
+      const highestAddress = data.results.reduce((max, customer) => customer.address > max ? customer.address : max, data.results[0].address);
+      return highestAddress;
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      return null;
+    }
   };
 
   const handleSearch = () => {
@@ -50,24 +67,58 @@ function Customers() {
     fetchRentedMovies(customer.customer_id);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const openNewCustomerModal = () => {
+    setNewCustomerModalOpen(true);
   };
 
+
+const handleCreateCustomer = async () => {
+  const highestAddressId = await fetchHighestAddressId();
+
+    const newCustomer = {
+        first_name: newCustomerFirstName,
+        last_name: newCustomerLastName,
+        email: newCustomerEmail,
+        active: 0,
+        create_date: new Date().toISOString(),
+        last_update: new Date().toISOString(),
+        address: highestAddressId+1,
+        store: newCustomerStore, 
+    };
+
+    console.log("Creating customer", newCustomer);
+
+    fetch('http://127.0.0.1:8000/customers/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newCustomer),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        setNewCustomerModalOpen(false);
+        fetchCustomers(1); // refresh the list of customers
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+};
+
+
   const fetchRentedMovies = (customerId) => {
-    setIsLoading(true);
 
     fetch(`http://127.0.0.1:8000/rentals/?customer_id=${customerId}`)
       .then((response) => response.json())
       .then((data) => {
         setRentedMovies(data.results);
-        setIsLoading(false);
       });
   };
 
   useEffect(() => {
     fetchCustomers(1);
-  }, []);
+  }, [fetchCustomers]);
 
   return (
     <Container>
@@ -95,7 +146,11 @@ function Customers() {
       <Button variant="contained" color="primary" onClick={handleSearch}>
         Search
       </Button>
+      <Button variant="contained" color="secondary" onClick={openNewCustomerModal} style={{ marginLeft: '20px' }}>
+        Add Customer
+      </Button>
 
+      {/* Customer List Table */}
       <TableContainer>
         <Table>
           <TableHead>
@@ -125,53 +180,53 @@ function Customers() {
         </Table>
       </TableContainer>
 
+      {/* Pagination */}
       <Pagination 
         count={totalPages} 
         page={page} 
         onChange={handlePageChange}
       />
 
-      <Modal open={isModalOpen} onClose={closeModal}>
-        <Container style={{ marginTop: '10vh', textAlign: 'center' }}>
-          <Paper elevation={3} style={{ padding: '2rem' }}>
-            <Typography variant="h6" gutterBottom>
-              Customer Details
-            </Typography>
-            {selectedCustomer && (
-              <div>
-                <Typography variant="subtitle1">
-                  Name: {selectedCustomer.first_name} {selectedCustomer.last_name}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Customer ID: {selectedCustomer.customer_id}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Email: {selectedCustomer.email}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Rented Movies
-                </Typography>
-                {isLoading ? (
-                  <CircularProgress />
-                ) : (
-                  <List>
-                    {rentedMovies.map((rental) => (
-                      <ListItem key={rental.rental_id}>
-                        <ListItemText primary={rental.film_title} />
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
-              </div>
-            )}
-            <Button variant="contained" color="primary" onClick={closeModal}>
-              Close
-            </Button>
-          </Paper>
-        </Container>
+      {/* Customer Details Modal */}
+      <Modal open={newCustomerModalOpen} onClose={() => setNewCustomerModalOpen(false)}>
+        <div style={{ backgroundColor: '#fff', padding: '1rem', margin: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2>Create New Customer</h2>
+          <TextField
+            label="First Name"
+            variant="outlined"
+            value={newCustomerFirstName}
+            onChange={(e) => setNewCustomerFirstName(e.target.value)}
+          />
+          <TextField
+            label="Last Name"
+            variant="outlined"
+            value={newCustomerLastName}
+            onChange={(e) => setNewCustomerLastName(e.target.value)}
+          />
+          <TextField
+            label="Email"
+            variant="outlined"
+            value={newCustomerEmail}
+            onChange={(e) => setNewCustomerEmail(e.target.value)}
+          />
+          <div>
+            <InputLabel id="store-select-label">Store</InputLabel>
+            <Select
+              labelId="store-select-label"
+              value={newCustomerStore}
+              onChange={(e) => setNewCustomerStore(e.target.value)}
+            >
+              <MenuItem value={1}>Store 1</MenuItem>
+              <MenuItem value={2}>Store 2</MenuItem>
+            </Select>
+          </div>
+          <Button variant="contained" color="primary" onClick={handleCreateCustomer}>
+            Create Customer
+          </Button>
+        </div>
       </Modal>
-    </Container>
-  );
+</Container>
+);
 }
 
 export default Customers;
