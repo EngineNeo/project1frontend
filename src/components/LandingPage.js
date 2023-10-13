@@ -32,7 +32,8 @@ function LandingPage() {
     useEffect(() => {
       fetch('http://127.0.0.1:8000/top-movies/')
           .then(response => response.json())
-          .then(data => setMoviesData(data));
+          .then(data => 
+            setMoviesData(data));
   
       fetch('http://127.0.0.1:8000/top-actors/')
           .then(response => response.json())

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import LandingPage from './LandingPage';
+import LandingPage from '../components/LandingPage';
 
 beforeEach(() => {
   fetch.resetMocks();

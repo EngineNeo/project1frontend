@@ -12,11 +12,7 @@
     "@mui/material": "^5.14.12",
     "@mui/styled-engine": "^5.14.12",
     "@mui/x-data-grid": "^6.16.1",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "jest": "^27.5.1",
-    "jest-fetch-mock": "^3.0.3",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.7.0",
     "react": "^18.2.0",
@@ -48,5 +44,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^14.0.0",
+    "axios-mock-adapter": "^1.22.0",
+    "fetch-mock": "^9.11.0",
+    "jest": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
+    "node-fetch": "^3.3.2"
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import Films from './Films';
+import Films from '../components/Films';
 
 beforeEach(() => {
   fetch.resetMocks();

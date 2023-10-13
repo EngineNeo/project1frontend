@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import Customers from './Customers';
+import Customers from '../components/Customers';
 
 beforeEach(() => {
   fetch.resetMocks();
