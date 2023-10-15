@@ -6,6 +6,8 @@ import {
 import Pagination from '@material-ui/lab/Pagination';
 import CustomerModal from './CustomerModal';
 import CustomerInfo from './CustomerInfo';
+import EditCustomer from './EditCustomer';
+import CreatePdf from './CreatePdf'
 
 function Customers() {
   const [customerId, setCustomerId] = useState('');
@@ -14,6 +16,9 @@ function Customers() {
   const [customers, setCustomers] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editCustomerData, setEditCustomerData] = useState(null);
 
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const closeModal = () => {
@@ -59,6 +64,15 @@ function Customers() {
     setCustomerModalOpen(true);
   };
 
+  const openEditModal = (customer) => {
+    setEditCustomerData(customer);
+    setEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setEditCustomerData(null);
+  };
 
   const handleCreateCustomer = (newCustomerData) => {
     console.log("Creating customer", newCustomerData);
@@ -165,6 +179,7 @@ function Customers() {
       <Button variant="contained" color="secondary" onClick={openCustomerModal} style={{ marginLeft: '20px' }}>
         Add Customer
       </Button>
+      <CreatePdf />
 
       {/* Customer List Table */}
       <TableContainer>
@@ -178,11 +193,12 @@ function Customers() {
               <TableCell>Active</TableCell>
               <TableCell>Create Date</TableCell>
               <TableCell>Last Update</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {customers.map((customer) => (
-              <TableRow key={customer.id} onClick={() => openModal(customer)}>
+              <TableRow key={customer.id}>
                 <TableCell>{customer.customer_id}</TableCell>
                 <TableCell>{customer.first_name}</TableCell>
                 <TableCell>{customer.last_name}</TableCell>
@@ -190,6 +206,14 @@ function Customers() {
                 <TableCell>{customer.active}</TableCell>
                 <TableCell>{customer.create_date}</TableCell>
                 <TableCell>{customer.last_update}</TableCell>
+                <TableCell>
+                  <Button variant="contained" color="primary" onClick={() => openModal(customer)}>
+                    View
+                  </Button>
+                  <Button variant="contained" color="secondary" onClick={() => openEditModal(customer)}>
+                    Edit
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -219,6 +243,15 @@ function Customers() {
         onClose={() => setCustomerModalOpen(false)}
         onCreate={handleCreateCustomer} // Here we're passing the handleCreateCustomer function as the onCreate prop
       />
+
+      {/* Edit Customer Modal */}
+      {editCustomerData && (
+        <EditCustomer
+          isOpen={editModalOpen}
+          onClose={closeEditModal}
+          customer={editCustomerData}
+        />
+      )}
 </Container>
 );
 }

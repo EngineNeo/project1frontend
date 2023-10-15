@@ -5,16 +5,25 @@ import {
   Paper,
   Typography,
   CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
   Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@material-ui/core';
 
 function CustomerInfo({ isOpen, onClose, customer, rentedMovies, isLoading, onDelete }) {
   const handleDelete = () => {
-    onDelete(customer.customer_id); 
-    onClose(); 
+    onDelete(customer.customer_id);
+    onClose();
+  };
+
+  const isReturned = (returnDate) => {
+    const currentDate = new Date();
+    const rentalReturnDate = new Date(returnDate);
+    return rentalReturnDate < currentDate;
   };
 
   return (
@@ -48,13 +57,28 @@ function CustomerInfo({ isOpen, onClose, customer, rentedMovies, isLoading, onDe
               {isLoading ? (
                 <CircularProgress />
               ) : (
-                <List>
-                  {rentedMovies.map((rental) => (
-                    <ListItem key={rental.rental_id}>
-                      <ListItemText primary={rental.film_title} />
-                    </ListItem>
-                  ))}
-                </List>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Movie Title</TableCell>
+                        <TableCell align="right">Rental Status</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rentedMovies.map((rental) => (
+                        <TableRow key={rental.rental_id}>
+                          <TableCell component="th" scope="row">
+                            {rental.film_title}
+                          </TableCell>
+                          <TableCell align="right">
+                            {isReturned(rental.return_date) ? 'Returned' : 'Rented'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               )}
             </div>
           )}
