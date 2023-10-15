@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardActions,
   List,
   ListItem,
   Table,
@@ -59,46 +58,6 @@ function Films() {
   const handleFilmClick = (film) => {
     setSelectedFilm(film);
   };  
-
-  const handleRent = async (filmId, userEmail) => {
-    setIsRentModalOpen(true);
-    try {
-      // Fetch customer_id using userEmail
-      const customerResponse = await fetch(`http://127.0.0.1:8000/customers/?email=${encodeURIComponent(userEmail)}`);
-      if (!customerResponse.ok) {
-        throw new Error('Failed to fetch customer data');
-      }
-      const customerData = await customerResponse.json();
-      console.log(customerData)
-      if (customerData.results.length === 0) {
-        throw new Error('No customer found with this email');
-      }
-      
-      const customerId = customerData.results[0].customer_id; // Assuming the email is unique and using the first match
-
-      // Proceed with creating the rental
-      const response = await fetch(`http://127.0.0.1:8000/rentals/create/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          film_id: filmId,
-          customer_id: customerId,
-          staff_id: 1,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      console.log('Rental successful:', data);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
 
   useEffect(() => {
     fetchFilms('', '', '', 1);
@@ -208,9 +167,7 @@ function Films() {
         isOpen={isRentModalOpen}
         onClose={() => setIsRentModalOpen(false)}
         film={selectedFilm}
-        onRent={handleRent}
       />
-
 
     </Container>
   );  

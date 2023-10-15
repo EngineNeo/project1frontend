@@ -5,7 +5,7 @@ function CustomerModal({ isOpen, onClose, onCreate, customerId, onDelete }) {
     const [customerFirstName, setCustomerFirstName] = useState('');
     const [customerLastName, setCustomerLastName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
-    const [customerAddress, setCustomerAddress] = useState(() => Math.floor(Math.random() * (606 - 5) + 5)); // random number between 5 and 605
+    const [customerAddress] = useState(() => Math.floor(Math.random() * (606 - 5) + 5)); // random number between 5 and 605
     const [customerStore, setCustomerStore] = useState('');
 
     const handleCreate = () => {
@@ -16,12 +16,6 @@ function CustomerModal({ isOpen, onClose, onCreate, customerId, onDelete }) {
             address: customerAddress,
             store: customerStore,
         });
-    };
-
-    const handleDelete = () => {
-        if (customerId) {
-            onDelete(customerId);
-        }
     };
 
     return (

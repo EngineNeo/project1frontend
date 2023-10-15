@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container, Typography, TextField, Button, Table,
   TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Modal, Paper, CircularProgress,
-  List, ListItem, ListItemText
 } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 import CustomerModal from './CustomerModal';
@@ -22,7 +20,7 @@ function Customers() {
     setIsModalOpen(false);
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [rentedMovies, setRentedMovies] = useState([]);
 
